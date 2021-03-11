@@ -140,7 +140,7 @@ class MNISTDataloader():
         y_dist = torch.abs(y - y.reshape(-1,1))    # this will evaluate |y[i]-y[j]| for all combinations of i,j
         # NOTE @karthikg92 do we have to threshold this?
         if euclid:
-            A = torch.sqrt(torch.square(x_dist) + torch.square(y_dist))
+            A = torch.sqrt(torch.square(x_dist).float() + torch.square(y_dist).float())
             A /= np.sqrt(H**2 + W**2)               # normalise with diagonal length
             return A
         else: 
