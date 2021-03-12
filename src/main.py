@@ -92,7 +92,7 @@ class Trainer():
             for j, (val_data, val_target) in enumerate(self.valLoader):
                 if self.args.dryrun and j == 100:
                     break
-                X_feat_val, A_val = self.mnist_dataloader.process(data, self.args.num_nodes, euclid=True)
+                X_feat_val, A_val = self.mnist_dataloader.process(val_data, self.args.num_nodes, euclid=True)
                 # add to cuda if available
                 X_feat_val = X_feat_val.to(self.device)
                 A_val      = A_val.to(self.device)
@@ -100,8 +100,8 @@ class Trainer():
                 #############
 
                 with torch.no_grad():
-                    val_predicted = self.network(X_feat_val, A_val)
-                _, val_predicted = torch.max(val_predicted.data,1)
+                    val_output = self.network(X_feat_val, A_val)
+                _, val_predicted = torch.max(val_output.data,1)
                 val_correct += (val_predicted == val_target).sum().item()
                 val_total   += val_predicted.shape[0]
             # important to set network back to training mode
