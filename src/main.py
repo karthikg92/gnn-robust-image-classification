@@ -55,6 +55,7 @@ class Trainer():
                 geom_loader = self.mnist_dataloader.process_torch_geometric(data, self.args.num_nodes, euclid=True)
                 for batch in geom_loader:
                     batch = batch.to(self.device)
+                    target = target.to(self.device)
 
                     self.optimizer.zero_grad()
                     # forward pass
@@ -90,6 +91,7 @@ class Trainer():
                 geom_loader_val = self.mnist_dataloader.process_torch_geometric(val_data, self.args.num_nodes, euclid=True)
                 for batch in geom_loader_val:
                     batch = batch.to(self.device)
+                    val_target = val_target.to(self.device)
                     
                     with torch.no_grad():
                         val_output = self.network(batch)
