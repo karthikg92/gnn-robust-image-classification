@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 
 from dataloader import MNISTDataloader
-from model import Net
+from model import CGConvNet
 from utils import print_args, print_box
 
 class Trainer():
@@ -31,9 +31,7 @@ class Trainer():
         ####################
 
         ### network init ###
-        self.network = Net(in_feat=self.args.in_feat, gcn_hid=self.args.gcn_hid,\
-                           lin_hid=self.args.lin_hid, num_nodes=self.args.num_nodes,\
-                           num_class=self.args.num_class, dropout=self.args.dropout).to(self.device)
+        self.network = CGConvNet(in_feat=self.args.in_feat, edge_feat=self.args.edge_feat, num_class=self.args.num_class).to(self.device)
         print_box(self.network, num_dash=80)
         print_box(f'Is the Network on CUDA?: {next(self.network.parameters()).is_cuda}')
         ####################
@@ -54,18 +52,15 @@ class Trainer():
             for batch_idx, (data, target) in enumerate(self.trainLoader):
                 if self.args.dryrun and batch_idx == 100:
                     break
-                X_feat, A = self.mnist_dataloader.process(data, self.args.num_nodes, euclid=True)
-                # add to cuda if available
-                X_feat = X_feat.to(self.device)
-                A      = A.to(self.device)
-                target = target.to(self.device)
-                #############
+                geom_loader = self.mnist_dataloader.process_torch_geometric(data, self.args.num_nodes, euclid=True)
+                for batch in geom_loader:
+                    batch = batch.to(self.device)
 
-                self.optimizer.zero_grad()
-                # forward pass
-                output = self.network(X_feat, A)
-                loss = self.loss_function(output, target)
-                ##############
+                    self.optimizer.zero_grad()
+                    # forward pass
+                    output = self.network(batch)
+                    loss = self.loss_function(output, target)
+                    ##############
 
                 # accuracy prediction
                 _, predicted = torch.max(output.data,1)
@@ -92,18 +87,15 @@ class Trainer():
             for j, (val_data, val_target) in enumerate(self.valLoader):
                 if self.args.dryrun and j == 100:
                     break
-                X_feat_val, A_val = self.mnist_dataloader.process(val_data, self.args.num_nodes, euclid=True)
-                # add to cuda if available
-                X_feat_val = X_feat_val.to(self.device)
-                A_val      = A_val.to(self.device)
-                val_target = val_target.to(self.device)
-                #############
-
-                with torch.no_grad():
-                    val_output = self.network(X_feat_val, A_val)
-                _, val_predicted = torch.max(val_output.data,1)
-                val_correct += (val_predicted == val_target).sum().item()
-                val_total   += val_predicted.shape[0]
+                geom_loader_val = self.mnist_dataloader.process_torch_geometric(val_data, self.args.num_nodes, euclid=True)
+                for batch in geom_loader_val:
+                    batch = batch.to(self.device)
+                    
+                    with torch.no_grad():
+                        val_output = self.network(batch)
+                    _, val_predicted = torch.max(val_output.data,1)
+                    val_correct += (val_predicted == val_target).sum().item()
+                    val_total   += val_predicted.shape[0]
             # important to set network back to training mode
             self.network.train()
 

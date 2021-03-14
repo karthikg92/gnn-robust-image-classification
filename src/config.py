@@ -17,6 +17,7 @@ parser.add_argument('--train_val_split_ratio', type=float, default=0.2,
 
 ##################### network architecture #####################
 parser.add_argument('--in_feat', type=int, default=1, help='Dimensionality of node features')
+parser.add_argument('--edge_feat', type=int, default=2, help='Dimensionality of edge features')
 parser.add_argument('--gcn_hid',type=int, nargs='+', default=[5,10], help='Hidden layer dimensions for GCN layers. Must be of length 2')
 parser.add_argument('--lin_hid', type=int, nargs='+', default=[128, 32], help='Hidden layer dimensions for linear layers')
 parser.add_argument('--num_class', type=int, default=10, help='Number of classes for classification')
