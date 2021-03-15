@@ -13,6 +13,7 @@ parser.add_argument('--batch_size', type=int, default=32, help='Batch size for t
 parser.add_argument('--train_val_split_ratio', type=float, default=0.2, 
                     help='Ratio to split dataset in train and validation sets;\
                     train_val_split_ratio in val and (1-train_val_split_ratio) in train')
+parser.add_argument('--num_neighbours', type=int, default=20, help='Number of neighbouring pixels to connect to')
 ##################################################################
 
 ##################### network architecture #####################

@@ -41,18 +41,16 @@ class Trainer():
 
     def train(self):
         train_step = 0
+        prog_bar = trange(self.args.epoch)
         for epoch in range(self.args.epoch):
-
-            if self.args.dryrun:
-                prog_bar = trange(100)
-            else:
-                prog_bar = trange(len(self.trainLoader))
 
             correct = 0; total = 0; epoch_loss = 0
             for batch_idx, (data, target) in enumerate(self.trainLoader):
+                # if dryrun then only run for 100 batches
                 if self.args.dryrun and batch_idx == 100:
                     break
-                geom_loader = self.mnist_dataloader.process_torch_geometric(data, self.args.num_nodes, euclid=True)
+                ############
+                geom_loader = self.mnist_dataloader.process_torch_geometric(data, self.args.num_nodes, k=self.args.num_neighbours)
                 for batch in geom_loader:
                     batch = batch.to(self.device)
                     target = target.to(self.device)
@@ -80,7 +78,6 @@ class Trainer():
 
                 train_step += 1
                 prog_bar.set_description(f'Epoch={epoch} Loss (loss={loss.item():.3f})')
-                prog_bar.update(1)
             
             # validation
             self.network.eval()
@@ -88,7 +85,7 @@ class Trainer():
             for j, (val_data, val_target) in enumerate(self.valLoader):
                 if self.args.dryrun and j == 100:
                     break
-                geom_loader_val = self.mnist_dataloader.process_torch_geometric(val_data, self.args.num_nodes, euclid=True)
+                geom_loader_val = self.mnist_dataloader.process_torch_geometric(val_data, self.args.num_nodes, k=self.args.num_neighbours)
                 for batch in geom_loader_val:
                     batch = batch.to(self.device)
                     val_target = val_target.to(self.device)
@@ -106,6 +103,7 @@ class Trainer():
                 self.logger.writer.add_scalar('Epoch loss', epoch_loss/len(self.trainLoader), epoch)
                 self.logger.writer.add_scalar('Train Accuracy', correct/total, epoch)
                 self.logger.writer.add_scalar('Val Accuracy', val_correct/val_total, epoch)
+            prog_bar.update(1)
 
     def save_checkpoint(self, path:str, train_step_num: int):
         """
