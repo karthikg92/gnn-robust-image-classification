@@ -194,8 +194,8 @@ class MNISTDataloader():
             A = (A>0).astype(int)   # make it a binary matrix
         A = torch.FloatTensor(A)
         # this will evaluate (x[i]-x[j]) and (y[i]-y[j]) for all combinations of i,j
-        x_dist = (x - x.reshape(-1,1))
-        y_dist = (y - y.reshape(-1,1))
+        x_dist = (x - x.reshape(-1,1)).float()
+        y_dist = (y - y.reshape(-1,1)).float()
         # make (r,θ) as edge_weights
         if polar:
             # this doesn't have self loops; diagonal elements are zero; [num_samples,num_samples]
