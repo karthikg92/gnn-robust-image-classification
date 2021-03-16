@@ -42,7 +42,7 @@ if __name__ == "__main__":
     loader = MNISTDataloader(num_nodes=num_nodes, batch_size=batch_size, train_val_split_ratio=0.2, seed=0, testing=False)
     trainloader = loader.train_dataloader
     for i, (data, target) in enumerate(trainloader):
-        geom_loader = loader.process_torch_geometric(data, num_samples=10, k=5)
+        geom_loader = loader.process_torch_geometric(data, num_samples=10, k=5, polar=True)
         for batch in geom_loader:
             print(f'Torch Geometric Batch: {batch}')
         break

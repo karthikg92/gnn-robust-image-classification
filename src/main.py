@@ -50,7 +50,7 @@ class Trainer():
                 if self.args.dryrun and batch_idx == 100:
                     break
                 ############
-                geom_loader = self.mnist_dataloader.process_torch_geometric(data, self.args.num_nodes, k=self.args.num_neighbours)
+                geom_loader = self.mnist_dataloader.process_torch_geometric(data, self.args.num_nodes, k=self.args.num_neighbours, polar=self.args.polar)
                 for batch in geom_loader:
                     batch = batch.to(self.device)
                     target = target.to(self.device)
@@ -85,7 +85,7 @@ class Trainer():
             for j, (val_data, val_target) in enumerate(self.valLoader):
                 if self.args.dryrun and j == 100:
                     break
-                geom_loader_val = self.mnist_dataloader.process_torch_geometric(val_data, self.args.num_nodes, k=self.args.num_neighbours)
+                geom_loader_val = self.mnist_dataloader.process_torch_geometric(val_data, self.args.num_nodes, k=self.args.num_neighbours, polar=self.args.polar)
                 for batch in geom_loader_val:
                     batch = batch.to(self.device)
                     val_target = val_target.to(self.device)

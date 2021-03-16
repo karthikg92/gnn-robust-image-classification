@@ -12,7 +12,7 @@ module load anaconda/2020a
 
 mkdir -p wandb_gnn
 # Run the script
-lrs=(0.001 0.001 0.001 0.001 0.0001 0.0001 0.0001 0.0001)
+polars=('True' 'True' 'True' 'True' 'False' 'False' 'False' 'False')
 nodes=(50 100 200 300 50 100 200 300)
 # script to iterate through different hyperparameters
-python main.py --num_nodes=${nodes[$SLURM_ARRAY_TASK_ID]} --lr=${lrs[$SLURM_ARRAY_TASK_ID]} --batch_size=64 &> out_${nodes[$SLURM_ARRAY_TASK_ID]}_${lrs[$SLURM_ARRAY_TASK_ID]}
+python main.py --num_nodes=${nodes[$SLURM_ARRAY_TASK_ID]} --polar=${polars[$SLURM_ARRAY_TASK_ID]} --batch_size=64 &> out_${nodes[$SLURM_ARRAY_TASK_ID]}_${polars[$SLURM_ARRAY_TASK_ID]}
