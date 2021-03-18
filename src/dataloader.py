@@ -23,7 +23,7 @@ from utils import store_args
 
 class MNISTDataloader():
     @store_args
-    def __init__(self, num_nodes:int, batch_size:int, train_val_split_ratio:float, seed:int, testing:bool):
+    def __init__(self, num_nodes:int, batch_size:int, train_val_split_ratio:float, seed:int, remove9:bool, testing:bool):
         """
             Dataloader for training with MNIST dataset
             Parameters:
@@ -38,6 +38,10 @@ class MNISTDataloader():
                 NOTE: should be less than 1; preferably keep it (< 0.5)
             seed: int
                 Random seed initialisation
+            remove9: bool
+                Whether the images containing the digit '9' are to be removed 
+                from the dataset since the digits ‘6’ and ‘9’ are equivalent 
+                modulo rotations, we remove the ‘9’ from the dataset.
             test: bool
                 If we also want to load the testloader
         """
@@ -51,7 +55,11 @@ class MNISTDataloader():
                                                 torchvision.transforms.Normalize( 
                                                 (0.1307,), (0.3081,)) 
                                                 ]))
+        # remove 9 from the dataset
+        if remove9:
+            self.remove_nine()
 
+        # split dataset into training and validation set and load into dataloaders
         self.train_val_split()
 
         if self.testing:
@@ -61,7 +69,7 @@ class MNISTDataloader():
                                                     torchvision.transforms.Normalize( 
                                                     (0.1307,), (0.3081,)) 
                                                     ]))
-            self.test_dataloader = torch.utils.data.Dataloader(testdata, batch_size=self.batch_size, shuffle=True)
+            self.test_dataloader = torch.utils.data.DataLoader(testdata, batch_size=self.batch_size, shuffle=True)
 
     def train_val_split(self):
         """
@@ -78,6 +86,19 @@ class MNISTDataloader():
         self.train_dataloader = torch.utils.data.DataLoader(self.dataset, sampler=train_sampler, batch_size=self.batch_size)
         self.val_dataloader = torch.utils.data.DataLoader(self.dataset, sampler=val_sampler, batch_size=self.batch_size)
     
+    def remove_nine(self):
+        """
+            Since the digits ‘6’ and ‘9’ are equivalent modulo 
+            rotations, we remove the ‘9’ from the dataset.
+            As done by Bruna et al. in Spectral Networks 
+            and Deep Locally Connected Networks on Graphs
+            https://arxiv.org/pdf/1312.6203.pdf
+        """
+        idx9 = (self.dataset.targets != 9)
+        self.dataset.data = self.dataset.data[idx9]
+        self.dataset.targets = self.dataset.targets[idx9]
+        self.dataset.classes.remove('9 - nine')
+
     def process_torch_geometric(self, data:torch.tensor, num_samples:int, k:int, polar:bool):
         """
             Sample random points from the images and 
@@ -211,7 +232,7 @@ class MNISTDataloader():
         return A, edge_weights
 
 if __name__ == "__main__":
-    loader = MNISTDataloader(10, 32, 0.5, 0, False)
+    loader = MNISTDataloader(10, 32, 0.5, 0, True, False)
     trainloader = loader.train_dataloader
     for i, (data, target) in enumerate(trainloader):
         geom_loader = loader.process_torch_geometric(data, num_samples=10, k=5, polar=True)

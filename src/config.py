@@ -15,6 +15,7 @@ parser.add_argument('--train_val_split_ratio', type=float, default=0.2,
                     train_val_split_ratio in val and (1-train_val_split_ratio) in train')
 parser.add_argument('--num_neighbours', type=int, default=20, help='Number of neighbouring pixels to connect to')
 parser.add_argument('--polar', type=lambda x:bool(strtobool(x)), default=False, help='Whether we want polar coords for edge_weights')
+parser.add_argument('--remove_9', type=lambda x:bool(strtobool(x)), default=True, help='If True, remove images with digit 9 from the dataset')
 ##################################################################
 
 ##################### network architecture #####################
@@ -43,6 +44,9 @@ def config_check(args:argparse.Namespace):
     # if dryrun the don't run for default number epochs
     if args.dryrun:
         args.epoch = 5
+    # if 9 is removed from the dataset, then reduce num_class
+    if args.remove_9:
+        args.num_class = 9
     return args
 
 args = parser.parse_args()

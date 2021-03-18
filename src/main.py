@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 
 from dataloader import MNISTDataloader
-from model import CGConvNet
+from model import GNNConvNet
 from utils import print_args, print_box
 
 class Trainer():
@@ -25,13 +25,14 @@ class Trainer():
 
         ### dataloader ###
         self.mnist_dataloader = MNISTDataloader(num_nodes=self.args.num_nodes, batch_size=self.args.batch_size,\
-                                                train_val_split_ratio=self.args.train_val_split_ratio, seed=self.args.seed, testing=False)
+                                                train_val_split_ratio=self.args.train_val_split_ratio,\
+                                                seed=self.args.seed, remove9=self.args.remove_9, testing=False)
         self.trainLoader = self.mnist_dataloader.train_dataloader
         self.valLoader   = self.mnist_dataloader.val_dataloader
         ####################
 
         ### network init ###
-        self.network = CGConvNet(in_feat=self.args.in_feat, edge_feat=self.args.edge_feat, num_class=self.args.num_class).to(self.device)
+        self.network = GNNConvNet(in_feat=self.args.in_feat, edge_feat=self.args.edge_feat, num_class=self.args.num_class).to(self.device)
         print_box(self.network, num_dash=80)
         print_box(f'Is the Network on CUDA?: {next(self.network.parameters()).is_cuda}')
         ####################
