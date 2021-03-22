@@ -22,6 +22,7 @@ parser.add_argument('--remove_9', type=lambda x:bool(strtobool(x)), default=True
 parser.add_argument('--in_feat', type=int, default=1, help='Dimensionality of node features')
 parser.add_argument('--edge_feat', type=int, default=2, help='Dimensionality of edge features')
 parser.add_argument('--num_class', type=int, default=10, help='Number of classes for classification')
+parser.add_argument('--K', type=int, default=1, help='Number of K hops in SGConv')
 ##################################################################
 
 ##################### optimizer #####################

@@ -32,7 +32,7 @@ class Trainer():
         ####################
 
         ### network init ###
-        self.network = GNNConvNet(in_feat=self.args.in_feat, edge_feat=self.args.edge_feat, num_class=self.args.num_class).to(self.device)
+        self.network = GNNConvNet(in_feat=self.args.in_feat, edge_feat=self.args.edge_feat, num_class=self.args.num_class, K=self.args.K).to(self.device)
         print_box(self.network, num_dash=80)
         print_box(f'Is the Network on CUDA?: {next(self.network.parameters()).is_cuda}')
         ####################

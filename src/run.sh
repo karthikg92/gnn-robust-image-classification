@@ -2,7 +2,7 @@
 
 # to run single experiment
 # Slurm sbatch options
-#SBATCH -a 0-9
+#SBATCH -a 0-15
 #SBATCH --gres=gpu:volta:1
 #SBATCH -n 10
 
@@ -12,8 +12,7 @@ module load anaconda/2020a
 
 mkdir -p wandb_gnn
 # Run the script
-# polars=('True' 'True' 'True' 'True' 'False' 'False' 'False' 'False')
-nodes=(50 100 200 300 400 50 100 200 300 400)
-nbrs=(20 20 20 20 20 40 40 40 40 40)
+nodes=(100 200 300 400 100 200 300 400 100 200 300 400 100 200 300 400)
+Ks=(2 2 2 2 3 3 3 3 5 5 5 5 10 10 10 10)
 # script to iterate through different hyperparameters
-python main.py --num_nodes=${nodes[$SLURM_ARRAY_TASK_ID]} --num_neighbours=${nbrs[$SLURM_ARRAY_TASK_ID]} --batch_size=64 &> out_${nodes[$SLURM_ARRAY_TASK_ID]}_${nbrs[$SLURM_ARRAY_TASK_ID]}
+python main.py --num_nodes=${nodes[$SLURM_ARRAY_TASK_ID]} --K=${Ks[$SLURM_ARRAY_TASK_ID]} --batch_size=64 &> out_${nodes[$SLURM_ARRAY_TASK_ID]}_${Ks[$SLURM_ARRAY_TASK_ID]}
