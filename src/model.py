@@ -38,7 +38,7 @@ class mySGConv(nn.Module):
         edge_feat = torch.abs(edge_feat)    # since we need to take sqrt for degree normalisation it has to be positive
         x1 = self.conv_head1(x, edge_index, edge_feat[:,0]) # [batch, out_feat]
         x2 = self.conv_head2(x, edge_index, edge_feat[:,1]) # [batch, out_feat]
-        x_out = torch.cat((x1,x2),1)
+        x_out = torch.cat((x1,x2),1)    # [batch, 2*out_feat]
         if self.num_edge_feat == 4:
             x3 = self.conv_head3(x, edge_index, edge_feat[:,2])
             x4 = self.conv_head4(x, edge_index, edge_feat[:,3])

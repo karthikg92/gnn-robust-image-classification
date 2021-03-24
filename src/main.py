@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from dataloader import MNISTDataloader
+from dataloader import MNISTDataloader, CIFARDataloader
 from model import GNNConvNet
 from utils import print_args, print_box
 
@@ -24,11 +24,16 @@ class Trainer():
         ####################
 
         ### dataloader ###
-        self.mnist_dataloader = MNISTDataloader(num_nodes=self.args.num_nodes, batch_size=self.args.batch_size,\
-                                                train_val_split_ratio=self.args.train_val_split_ratio,\
-                                                seed=self.args.seed, remove9=self.args.remove_9, testing=False)
-        self.trainLoader = self.mnist_dataloader.train_dataloader
-        self.valLoader   = self.mnist_dataloader.val_dataloader
+        if args.dataset == 'MNIST':
+            self.master_dataloader = MNISTDataloader(num_nodes=self.args.num_nodes, batch_size=self.args.batch_size,
+                                                    train_val_split_ratio=self.args.train_val_split_ratio,
+                                                    seed=self.args.seed, remove9=self.args.remove_9, testing=False)
+        if args.dataset == 'CIFAR':
+            self.master_dataloader = CIFARDataloader(num_nodes=self.args.num_nodes, batch_size=self.args.batch_size,
+                                                    train_val_split_ratio=self.args.train_val_split_ratio,
+                                                    seed=self.args.seed, testing=False)
+        self.trainLoader = self.master_dataloader.train_dataloader
+        self.valLoader   = self.master_dataloader.val_dataloader
         ####################
 
         ### network init ###
@@ -51,7 +56,7 @@ class Trainer():
                 if self.args.dryrun and batch_idx == 100:
                     break
                 ############
-                geom_loader = self.mnist_dataloader.process_torch_geometric(data, self.args.num_nodes, k=self.args.num_neighbours, polar=self.args.polar)
+                geom_loader = self.master_dataloader.process_torch_geometric(data, sampling_strategy=self.args.sampling_strategy, num_samples=self.args.num_nodes, k=self.args.num_neighbours, polar=self.args.polar)
                 for batch in geom_loader:
                     batch = batch.to(self.device)
                     target = target.to(self.device)
@@ -86,7 +91,7 @@ class Trainer():
             for j, (val_data, val_target) in enumerate(self.valLoader):
                 if self.args.dryrun and j == 100:
                     break
-                geom_loader_val = self.mnist_dataloader.process_torch_geometric(val_data, self.args.num_nodes, k=self.args.num_neighbours, polar=self.args.polar)
+                geom_loader_val = self.master_dataloader.process_torch_geometric(val_data, sampling_strategy=self.args.sampling_strategy, num_samples=self.args.num_nodes, k=self.args.num_neighbours, polar=self.args.polar)
                 for batch in geom_loader_val:
                     batch = batch.to(self.device)
                     val_target = val_target.to(self.device)

@@ -9,6 +9,7 @@ parser.add_argument('--epoch', type=int, default=1000, help='Number of epochs fo
 ##################################################################
 
 ##################### data #####################
+parser.add_argument('--dataset', type=str, default='MNIST', choices=['MNIST', 'CIFAR', 'SVHN'], help='Choice of dataset')
 parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training')
 parser.add_argument('--train_val_split_ratio', type=float, default=0.2, 
                     help='Ratio to split dataset in train and validation sets;\
@@ -16,6 +17,8 @@ parser.add_argument('--train_val_split_ratio', type=float, default=0.2,
 parser.add_argument('--num_neighbours', type=int, default=20, help='Number of neighbouring pixels to connect to')
 parser.add_argument('--polar', type=lambda x:bool(strtobool(x)), default=False, help='Whether we want polar coords for edge_weights')
 parser.add_argument('--remove_9', type=lambda x:bool(strtobool(x)), default=True, help='If True, remove images with digit 9 from the dataset')
+parser.add_argument('--sampling_strategy', type=str, default='random', choices=['random', 'fixed', 'full', 'patch'],
+                    help='Strategy to sample pixels from image; Refer dataloader.py for more info')
 ##################################################################
 
 ##################### network architecture #####################
@@ -48,6 +51,13 @@ def config_check(args:argparse.Namespace):
     # if 9 is removed from the dataset, then reduce num_class
     if args.remove_9:
         args.num_class = 9
+    # if dataset is CIFAR, then change num_classes 
+    # back to 10 and node feature dimension to 3
+    if args.dataset == 'CIFAR':
+        args.num_class = 10
+        args.in_feat = 3
+    if args.dataset != 'MNIST':
+        args.remove_9 = None
     return args
 
 args = parser.parse_args()
