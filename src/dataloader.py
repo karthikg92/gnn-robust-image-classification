@@ -1,6 +1,6 @@
 """
-    Dataloader for MNIST data
-    * Load the MNIST data
+    Dataloader for MNIST/CIFAR data
+    * Load the MNIST/CIFAR data
     * Sample random pixels
     * Create a graph out of those pixels
         * Make adjacency matrix
@@ -181,7 +181,7 @@ class MNISTDataloader():
         torch.manual_seed(self.seed)
         # download MNIST and perform standard transforms
         # this is the training+validation set; have to split it into train-val set manually
-        self.dataset = torchvision.datasets.MNIST('MNIST_data/', train=True, download=True, 
+        self.dataset = torchvision.datasets.MNIST('../data/MNIST_data/', train=True, download=True, 
                                                 transform=torchvision.transforms.Compose([ 
                                                 torchvision.transforms.ToTensor(), 
                                                 torchvision.transforms.Normalize( 
@@ -310,7 +310,7 @@ class CIFARDataloader():
         self.classes = ('plane', 'car', 'bird', 'cat', 'truck'
                         'deer', 'dog', 'frog', 'horse', 'ship')
         # this is the training+validation set; have to split it into train-val set manually
-        self.dataset = torchvision.datasets.CIFAR10('CIFAR_data/', train=True, download=True, 
+        self.dataset = torchvision.datasets.CIFAR10('../data/CIFAR_data/', train=True, download=True, 
                                                 transform=torchvision.transforms.Compose([ 
                                                 torchvision.transforms.ToTensor(), 
                                                 torchvision.transforms.Normalize( 
